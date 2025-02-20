@@ -104,6 +104,12 @@ app.put("/tasks/:id", async (req, res) => {
   const result = await taskCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
+app.delete("/tasks/:id", async (req, res) => {
+  const { id } = req.params;
+  const filter = { _id: new ObjectId(id) };
+  const result = await taskCollection.deleteOne(filter);
+  res.send(result);
+});
 app.get("/", (req, res) => {
   res.send("Hotel Management System");
 });
