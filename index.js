@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const { connection, client } = require("./DB/MongoDB");
+const { ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 5000;
 connection();
@@ -37,6 +38,7 @@ const verifyToken = (req, res, next) => {
 
 //All Collection mealsCollection
 const usersCollection = client.db("taskManagement").collection("users");
+const taskCollection = client.db("taskManagement").collection("tasks");
 
 //Create token use jwt
 app.post("/jwt", async (req, res) => {
@@ -61,6 +63,47 @@ app.post("/logout", async (req, res) => {
 });
 //Create token use jwt
 
+//Save user information
+app.post("/users", async (req, res) => {
+  const user = req.body;
+  const existUsers = await usersCollection.findOne({ email: user.email });
+  if (existUsers) {
+    return res.send({ message: "User already exist" });
+  }
+  const result = await usersCollection.insertOne(user);
+  res.send(result);
+});
+
+app.post("/tasks", async (req, res) => {
+  const { title, description, status } = req.body;
+  const newTask = {
+    title,
+    description,
+    status,
+    timestamp: new Date(),
+  };
+  const result = await taskCollection.insertOne(newTask);
+  res.send(result);
+});
+
+app.get("/tasks", async (req, res) => {
+  const tasks = await taskCollection.find().toArray();
+  res.send(tasks);
+});
+app.put("/tasks/:id", async (req, res) => {
+  const { id } = req.params;
+  const { title, description, status } = req.body;
+  const filter = { _id: new ObjectId(id) };
+  const updateDoc = {
+    $set: {
+      title,
+      description,
+      status,
+    },
+  };
+  const result = await taskCollection.updateOne(filter, updateDoc);
+  res.send(result);
+});
 app.get("/", (req, res) => {
   res.send("Hotel Management System");
 });
