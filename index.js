@@ -77,7 +77,7 @@ app.post("/users", async (req, res) => {
   res.send(result);
 });
 
-app.post("/tasks", async (req, res) => {
+app.post("/tasks", verifyToken, async (req, res) => {
   const { title, description, status } = req.body;
   const newTask = {
     title,
@@ -89,11 +89,11 @@ app.post("/tasks", async (req, res) => {
   res.send(result);
 });
 
-app.get("/tasks", async (req, res) => {
+app.get("/tasks", verifyToken, async (req, res) => {
   const tasks = await taskCollection.find().toArray();
   res.send(tasks);
 });
-app.put("/tasks/:id", async (req, res) => {
+app.put("/tasks/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const { title, description, status } = req.body;
   const filter = { _id: new ObjectId(id) };
