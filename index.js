@@ -107,6 +107,7 @@ app.put("/tasks/:id", verifyToken, async (req, res) => {
   const result = await taskCollection.updateOne(filter, updateDoc);
   res.send(result);
 });
+
 app.delete("/tasks/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   const filter = { _id: new ObjectId(id) };
